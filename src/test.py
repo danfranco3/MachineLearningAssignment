@@ -48,11 +48,10 @@ for i in range(len(dataframes)):
     clf.fit(X_train, y_train)
     predictions = clf.predict(X_test)
     print(predictions)
+    svmPredictions[i] = predictions
     
     prediction = np.sign(predictions)
     np.where(prediction == -1, 0, 1)
-    
-    
     
     acc = accuracy(y_test, prediction)
     accs.append(acc)
