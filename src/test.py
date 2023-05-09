@@ -17,7 +17,7 @@ X1, y1, categorical_indicator, attribute_names = dataset.get_data(
 df = pd.DataFrame(X1, columns=attribute_names)
 df["class"] = y1
 
-dataframes = split_dataset(df, n_features=2)
+dataframes = split_dataset(df, n_features=2, n_df=28)
 
 X = []
 y = df["class"]
@@ -28,6 +28,8 @@ for i in range(len(dataframes)):
     #print(f"Dataframe {i+1}:\n {dataframes[i].head()}")
     X.append(dataframes[i].iloc[0:dataframes[i].shape[0],0:dataframes[i].shape[1] - 1])
 
+accs = []
+
 for i in range(len(dataframes)):
     XF = X[i].to_numpy()
     X_train, X_test, y_train, y_test = train_test_split(XF, y, test_size=0.2, shuffle=True, random_state=1)
@@ -36,8 +38,11 @@ for i in range(len(dataframes)):
     clf.fit(X_train, y_train)
     predictions = clf.predict(X_test)
     print(predictions)
-    print("SVM Accuracy: ", accuracy(y_test, predictions))
+    acc = accuracy(y_test, predictions)
+    accs.append(acc)
+    print("SVM Accuracy: ", acc)
 
+print("Average Accuracy: ", sum(accs)/len(accs))
 
 
     
