@@ -46,5 +46,6 @@ class SVM:
     
     def predict(self, X):
         estimate = np.dot(X, self.w) + self.b
-        prediction = np.sign(estimate)
-        return np.where(prediction == -1, 0, 1)
+        return estimate
+#        prediction = np.sign(estimate)
+#        return np.where(prediction == -1, 0, 1)
