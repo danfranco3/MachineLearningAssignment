@@ -92,4 +92,4 @@ for i in range(resultsSize):
 
 
 print(finalPredictions)
-print("SVM Accuracy: ", accuracy(y_test, finalPredictions))
+print("Final SVM Accuracy: ", accuracy(y_test, finalPredictions))
