@@ -24,7 +24,7 @@ X1, y1, categorical_indicator, attribute_names = dataset.get_data(
 df = pd.DataFrame(X1, columns=attribute_names)
 df["class"] = y1
 
-dataframes = split_dataset(df, n_features=2)
+dataframes = split_dataset(df, n_features=2, n_df=28)
 
 X = []
 y = df["class"]
@@ -34,6 +34,8 @@ print(y)
 for i in range(len(dataframes)):
     #print(f"Dataframe {i+1}:\n {dataframes[i].head()}")
     X.append(dataframes[i].iloc[0:dataframes[i].shape[0],0:dataframes[i].shape[1] - 1])
+
+accs = []
 
 svmPredictions = [None] * len(dataframes)         # set of predictions from each svm
 resultsSize = 0                                   # nr of predictions
@@ -45,20 +47,18 @@ for i in range(len(dataframes)):
     clf = SVM(n_iters=1000)
     clf.fit(X_train, y_train)
     predictions = clf.predict(X_test)
-    svmPredictions[i] = predictions
-
-    print(svmPredictions[i])
-
+    print(predictions)
+    
     prediction = np.sign(predictions)
     np.where(prediction == -1, 0, 1)
-    print("SVM Accuracy: ", accuracy(y_test, prediction))
+    
+    
+    
+    acc = accuracy(y_test, prediction)
+    accs.append(acc)
+    print("SVM Accuracy: ", acc)
 
-
-    #print(predictions)
-    #print("SVM Accuracy: ", accuracy(y_test, predictions))
-
-print("second prediction was: ")
-print(svmPredictions[3][1])
+print("Average Accuracy: ", sum(accs)/len(accs))
 
 nrOfSVMs = len(svmPredictions)
 resultsSize = len(svmPredictions[0])
