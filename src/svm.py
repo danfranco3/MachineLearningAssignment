@@ -45,7 +45,7 @@ class SVM:
                 self._update_weights_bias(dw, db)
     
     def predict(self, X):
-        estimate = np.dot(X, self.w) + self.b
+        estimate = (np.dot(X, self.w) + self.b) / np.linalg.norm(self.w)
         return estimate
 #        prediction = np.sign(estimate)
 #        return np.where(prediction == -1, 0, 1)
