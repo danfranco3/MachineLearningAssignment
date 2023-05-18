@@ -6,8 +6,6 @@ from svm import SVM
 from sklearn.model_selection import train_test_split
 import numpy as np
 from weights import calc_weights
-from sklearn.metrics import accuracy_score as accuracy
-from sklearn.metrics import precision_score, recall_score
 
 def get_dataset(dataset_name):
     dataset = openml.datasets.get_dataset(dataset_name)
@@ -20,7 +18,12 @@ def get_dataset(dataset_name):
 
     return df
 
-def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, test_size=0.2, n_iters=1000):
+def accuracy(y_true, y_pred):
+    # print(y_true)
+    # print(y_pred)
+    return np.sum(y_true==y_pred) / len(y_true)
+
+def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, test_size=0.2, n_iters=1000, majority=False):
     
     df = get_dataset(dataset_name)
 
@@ -43,17 +46,21 @@ def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, test_
         prediction = np.sign(predictions)
         np.where(prediction == -1, 0, 1)
 
+        print("SVM Accuracy: ", accuracy(test["class"].to_numpy(), prediction))
+
     print("Calculating weights...")
 
-    finalPredictions = calc_weights(svmPredictions, resultsSize)
+    finalPredictions = calc_weights(svmPredictions, resultsSize, majority)
 
-    final_acc = accuracy(test["class"], finalPredictions)
+    print(test)
 
-    print("Final SVM Accuracy: ", final_acc)
+    y_pred = test["class"].to_numpy()
 
-    return gen_df(dataset_name, n_df, final_acc, precision_score(test["class"], finalPredictions), recall_score(test["class"], finalPredictions))
+    print("Final SVM Accuracy: ", accuracy(y_pred, finalPredictions))
 
-def gen_df(dataset_name, n_df, final_acc, precision, recall):
-    df = pd.DataFrame.from_dict({'Dataset': dataset_name, 'n_df': n_df, 'final_acc': final_acc, 'precision': precision, 'recall': recall}, orient='index').transpose()
+    return gen_df(dataset_name, n_df, accuracy(y_pred, finalPredictions))
+
+def gen_df(dataset_name, n_df, final_acc):
+    df = pd.DataFrame.from_dict({'Dataset': dataset_name, 'n_df': n_df, 'final_acc': final_acc}, orient='index').transpose()
     return df
 

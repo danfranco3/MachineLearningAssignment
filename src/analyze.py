@@ -9,12 +9,12 @@ dataset_names = ['diabetes']
 
 TEST_SIZE = 0.2
 
-parameter_variation = [(28, 2), (26, 2), (27, 3)]
+parameter_variation = [(28, 2, True), (28, 2, False), (26, 2, True), (27, 3, True)]
 
 for name in dataset_names:
-    for (n_df, n_features) in parameter_variation:
+    for (n_df, n_features, majority) in parameter_variation:
         print(f"Testing with {name} dataset, {n_df} sub-datasets and {n_features} features")
-        df = test_with_dataset(name, n_df, n_features, random_state=1, test_size=TEST_SIZE)
+        df = test_with_dataset(name, n_df, n_features, random_state=1, test_size=TEST_SIZE, majority=majority)
         df.to_csv(f"../results/{name}_{n_df}_{n_features}.csv")
 
     dataset = get_dataset(name)
