@@ -36,10 +36,8 @@ def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, test_
         cur_df = subdataframe_list[i]
         clf = SVM(n_iters=1000)
         cols = [c for c in cur_df.columns if c != "class"]
-        print(cur_df[cols])
         clf.fit(cur_df[cols].to_numpy(), cur_df["class"].to_numpy())
         predictions = clf.predict(test[cols].to_numpy())
-        print(predictions)
         svmPredictions[i] = predictions
 
         prediction = np.sign(predictions)
@@ -51,7 +49,6 @@ def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, test_
 
     final_acc = accuracy(test["class"], finalPredictions)
 
-    # print(finalPredictions)
     print("Final SVM Accuracy: ", final_acc)
 
     return gen_df(dataset_name, n_df, final_acc, precision_score(test["class"], finalPredictions), recall_score(test["class"], finalPredictions))
