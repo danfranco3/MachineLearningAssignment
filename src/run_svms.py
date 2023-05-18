@@ -24,57 +24,39 @@ def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, test_
     
     df = get_dataset(dataset_name)
 
-    dataframes = split_dataset(df, n_features, n_df)
+    train, test = train_test_split(df, test_size=0.2, shuffle=True, random_state=1)
 
-    X = []
-    y = df["class"]
-    # print(y1)
-    # print(y)
+    subdataframe_list = split_dataset(train, 2, 28, randomize_list=False)
 
-    for i in range(len(dataframes)):
-        #print(f"Dataframe {i+1}:\n {dataframes[i].head()}")
-        X.append(dataframes[i].iloc[0:dataframes[i].shape[0],0:dataframes[i].shape[1] - 1])
-
-    accs = []
-
-    svmPredictions = [None] * len(dataframes)         # set of predictions from each svm
+    svmPredictions = [None] * len(subdataframe_list)         # set of predictions from each svm
     resultsSize = 0                                   # nr of predictions
 
-    print("Calculating SVM predictions...")
-
-    for i in range(len(dataframes)):
-        XF = X[i].to_numpy()
-        X_train, X_test, y_train, y_test = train_test_split(XF, y, test_size=test_size, random_state=random_state)
+    for i in range(len(subdataframe_list)):
         
-        clf = SVM(n_iters=n_iters)
-        clf.fit(X_train, y_train)
-        predictions = clf.predict(X_test)
-        # print(predictions)
+        cur_df = subdataframe_list[i]
+        clf = SVM(n_iters=1000)
+        cols = [c for c in cur_df.columns if c != "class"]
+        print(cur_df[cols])
+        clf.fit(cur_df[cols].to_numpy(), cur_df["class"].to_numpy())
+        predictions = clf.predict(test[cols].to_numpy())
+        print(predictions)
         svmPredictions[i] = predictions
-        
+
         prediction = np.sign(predictions)
         np.where(prediction == -1, 0, 1)
-        
-        acc = accuracy(y_test, prediction)
-        accs.append(acc)
-        print("SVM Accuracy: ", acc)
-
-    avg_acc = sum(accs)/len(accs)
-
-    print("Average Accuracy: ", avg_acc)
 
     print("Calculating weights...")
 
     finalPredictions = calc_weights(svmPredictions, resultsSize)
 
-    final_acc = accuracy(svmPredictions, finalPredictions)
+    final_acc = accuracy(test["class"], finalPredictions)
 
     # print(finalPredictions)
     print("Final SVM Accuracy: ", final_acc)
 
-    return gen_df(dataset_name, n_df, avg_acc, final_acc, precision_score(y_test, finalPredictions), recall_score(y_test, finalPredictions))
+    return gen_df(dataset_name, n_df, final_acc, precision_score(test["class"], finalPredictions), recall_score(test["class"], finalPredictions))
 
-def gen_df(dataset_name, n_df, avg_acc, final_acc, precision, recall):
-    df = pd.DataFrame.from_dict({'Dataset': dataset_name, 'n_df': n_df, 'avg_acc': avg_acc, 'final_acc': final_acc, 'precision': precision, 'recall': recall}, orient='index').transpose()
+def gen_df(dataset_name, n_df, final_acc, precision, recall):
+    df = pd.DataFrame.from_dict({'Dataset': dataset_name, 'n_df': n_df, 'final_acc': final_acc, 'precision': precision, 'recall': recall}, orient='index').transpose()
     return df
 
