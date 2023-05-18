@@ -36,9 +36,11 @@ for i in range(len(dataframes)):
     X.append(dataframes[i].iloc[0:dataframes[i].shape[0],0:dataframes[i].shape[1] - 1])
 
 accs = []
-
+ 
+print(f"Dataframe length: {len(dataframes)}")
 svmPredictions = [None] * len(dataframes)         # set of predictions from each svm
 resultsSize = 0                                   # nr of predictions
+lengthPredictions = [None] * len(dataframes)
 
 for i in range(len(dataframes)):
     XF = X[i].to_numpy()
@@ -49,6 +51,7 @@ for i in range(len(dataframes)):
     predictions = clf.predict(X_test)
     print(predictions)
     svmPredictions[i] = predictions
+    lengthPredictions[i] = len(predictions)
     
     prediction = np.sign(predictions)
     np.where(prediction == -1, 0, 1)
@@ -61,34 +64,61 @@ print("Average Accuracy: ", sum(accs)/len(accs))
 
 nrOfSVMs = len(svmPredictions)
 resultsSize = len(svmPredictions[0])
+print(f"Results size: {resultsSize}")
+print(f"Nr of SVM's: {nrOfSVMs}")
+print(f"length of y_test: {len(y_test)}")
 finalPredictions = [0] * resultsSize
+
+# Defines if weights will be used for each SVM
+majority = False
+
+for i in range(len(dataframes)):
+    print(f"Length of prediction {i} is: {lengthPredictions[i]}")
 
 # calculating the weights
 for i in range(resultsSize):
 
-    absValPred = [0] * nrOfSVMs             # distance to the hyperplane
-    rank = [0] * nrOfSVMs                   # ranking of the most certain svm's
-    pred = [0] * nrOfSVMs                   # prediction from each SVM
-    sumTotal = 0                            # factor to calculate the weights
+    if majority:
+        
+        totalZero = 0
+        totalOne  = 0
 
+        for j in range(nrOfSVMs):
+            goal = sign(svmPredictions[j][i])
+            if goal==1:
+                totalOne+=1
+            else:
+                totalZero+=1
+        
+        if totalOne >= totalZero:
+            finalPredictions[i] = 1
+        else:
+            finalPredictions[i] = 0
 
-    for j in range(nrOfSVMs):
-        absValPred[j] = abs(svmPredictions[j][i])
-        pred[j] = sign(svmPredictions[j][i])
-        sumTotal += (j+1)
+    else :
 
-    for j in range(nrOfSVMs):
-        rank[j] = absValPred.index(max(absValPred))               # ranks from best to worst
-        absValPred[rank[j]] = 0
+        absValPred = [0] * nrOfSVMs             # distance to the hyperplane
+        rank = [0] * nrOfSVMs                   # ranking of the most certain svm's
+        pred = [0] * nrOfSVMs                   # prediction from each SVM
+        sumTotal = 0                            # factor to calculate the weights
 
-    for j in range(nrOfSVMs):
-        weigth = (nrOfSVMs - j) / sumTotal
-        finalPredictions[i] += (weigth * pred[rank[j]])
+        for j in range(nrOfSVMs):
+            absValPred[j] = abs(svmPredictions[j][i])
+            pred[j] = sign(svmPredictions[j][i])
+            sumTotal += (j+1)
 
-    if finalPredictions[i] >= 0:
-        finalPredictions[i] = 1
-    else:
-        finalPredictions[i] = 0
+        for j in range(nrOfSVMs):
+            rank[j] = absValPred.index(max(absValPred))               # ranks from best to worst
+            absValPred[rank[j]] = 0
+
+        for j in range(nrOfSVMs):
+            weigth = (nrOfSVMs - j) / sumTotal
+            finalPredictions[i] += (weigth * pred[rank[j]])
+
+        if finalPredictions[i] >= 0:
+            finalPredictions[i] = 1
+        else:
+            finalPredictions[i] = 0
 
 
 print(finalPredictions)
