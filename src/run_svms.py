@@ -26,13 +26,13 @@ def accuracy(y_true, y_pred):
     return np.sum(y_true==y_pred) / len(y_true)
 
 def precision(y_true, y_pred):
-    return precision_score(y_true, y_pred)
+    return precision_score(y_true, y_pred, zero_division=0)
 
 def recall(y_true, y_pred):
-    return recall_score(y_true, y_pred)
+    return recall_score(y_true, y_pred, zero_division=0)
 
 def fMeasure(y_true, y_pred):
-    return f1_score(y_true, y_pred)
+    return f1_score(y_true, y_pred, zero_division=0)
 
 def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, size=0.2, n_iters=1000, majority=False):
     
