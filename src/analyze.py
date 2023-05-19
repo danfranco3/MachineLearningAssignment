@@ -9,22 +9,22 @@ from run_svms import accuracy
 from singleSVM import singleSVM
 
 # dataset_names = ['wdbc', 'diabetes', 'ilpd', 'electricity', 'bank-marketing']
+def run():
+    dataset_names = ['diabetes', 'credit-g', 'wdbc']
 
-dataset_names = ['diabetes', 'credit-g', 'wdbc']
+    TEST_SIZE = 0.3
 
-TEST_SIZE = 0.3
+    parameter_variation = [(28, 2, True)]
 
-parameter_variation = [(28, 2, True)]
+    # [(28, 2, True), (28, 2, False), (26, 2, True), (27, 3, True)]
 
-# [(28, 2, True), (28, 2, False), (26, 2, True), (27, 3, True)]
+    for name in dataset_names:
 
-for name in dataset_names:
+        print(f"Testing {name} dataset.")
 
-    print(f"Testing {name} dataset.")
+        singleSVM(name, TEST_SIZE)
 
-    singleSVM(name, TEST_SIZE)
-
-    for (n_df, n_features, majority) in parameter_variation:
-        print(f"Testing with {name} dataset, {n_df} sub-datasets and {n_features} features")
-        df = test_with_dataset(name, n_df, n_features, random_state=1, size=TEST_SIZE, majority=majority)
-        
+        for (n_df, n_features, majority) in parameter_variation:
+            print(f"Testing with {name} dataset, {n_df} sub-datasets and {n_features} features")
+            df = test_with_dataset(name, n_df, n_features, random_state=1, size=TEST_SIZE, majority=majority)
+            
