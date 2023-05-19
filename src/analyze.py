@@ -7,15 +7,17 @@ from sklearn import svm
 
 dataset_names = ['diabetes']
 
-TEST_SIZE = 0.2
+TEST_SIZE = 0.3
 
-parameter_variation = [(28, 2, False), (28, 2, False), (26, 2, True), (27, 3, True)]
+parameter_variation = [(28, 2, True)]
+
+# [(28, 2, True), (28, 2, False), (26, 2, True), (27, 3, True)]
 
 for name in dataset_names:
     for (n_df, n_features, majority) in parameter_variation:
         print(f"Testing with {name} dataset, {n_df} sub-datasets and {n_features} features")
-        df = test_with_dataset(name, n_df, n_features, random_state=1, test_size=TEST_SIZE, majority=majority)
-        df.to_csv(f"../results/{name}_{n_df}_{n_features}.csv")
+        df = test_with_dataset(name, n_df, n_features, random_state=1, size=TEST_SIZE, majority=majority)
+        # df.to_csv(f"../results/{name}_{n_df}_{n_features}.csv")
 
     dataset = get_dataset(name)
 
@@ -31,6 +33,10 @@ for name in dataset_names:
 
     acc = accuracy_score(y_test, y_pred)
 
+    print(acc)
+
     df = gen_df(name, -1, -1, acc)
 
-    df.to_csv(f"../results/{name}_scikit_svm.csv")
+    
+
+    # df.to_csv(f"results.csv")
