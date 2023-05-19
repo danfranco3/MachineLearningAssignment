@@ -13,4 +13,4 @@ This is done by using the test.py file.
 
 The dataset_names list are the names of the different openML datasets for the script to test.
 
-Running the test.py file will prompt the test the begin and print the metrics for each SVM test.
+Running the Main.ipynb file will prompt the test the begin and print the metrics for some SVM tests.
