@@ -10,11 +10,11 @@ from singleSVM import singleSVM
 
 # dataset_names = ['wdbc', 'diabetes', 'ilpd', 'electricity', 'bank-marketing']
 def run():
-    dataset_names = ['diabetes', 'credit-g', 'wdbc']
+    dataset_names = ['wdbc', 'diabetes', 'ilpd', 'bank-authentication', 'credit-g']
 
     TEST_SIZE = 0.3
 
-    parameter_variation = [(28, 2, True)]
+    parameter_variation = [(3, 2, True), (4, 3, True)]
 
     # [(28, 2, True), (28, 2, False), (26, 2, True), (27, 3, True)]
 
@@ -28,3 +28,6 @@ def run():
             print(f"Testing with {name} dataset, {n_df} sub-datasets and {n_features} features")
             df = test_with_dataset(name, n_df, n_features, random_state=1, size=TEST_SIZE, majority=majority)
             
+
+run()
+

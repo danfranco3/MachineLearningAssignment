@@ -48,16 +48,17 @@ def confusion_matrix_plot(y_true, y_pred):
     plt.show()
 
 
-def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, size=0.2, n_iters=1000, majority=False):
+def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, size=0.2, n_iters=1000, majority=False, randomize_list = True):
     
     df = get_dataset(dataset_name)
 
-    train, test = train_test_split(df, test_size=size, shuffle=True, random_state=1)
+    train, test = train_test_split(df, test_size=size, shuffle=True, random_state=random_state)
 
-    subdataframe_list = split_dataset(train, 2, 28, randomize_list=False)
+    subdataframe_list = split_dataset(train, n_features, n_df, randomize_list=randomize_list)
 
     svmPredictions = [None] * len(subdataframe_list)         # set of predictions from each svm
 
+    print("Subdataframe list length:", len(subdataframe_list))
 
     for i in range(len(subdataframe_list)):
         

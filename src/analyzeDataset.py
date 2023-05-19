@@ -14,7 +14,7 @@ from sklearn.svm import SVC
 from pymfe.mfe import MFE
 import pymfe.complexity as cp
 
-dataset_names = ['wdbc', 'diabetes', 'ilpd', 'credit-g']
+dataset_names = ['bank-marketing', 'balance-scale']        # ['wdbc', 'diabetes', 'ilpd', 'credit-g']
 
 def holdout_estimation(X,y,models,ts=0.3,seed=0):
     X_train, X_test, y_train, y_test = \

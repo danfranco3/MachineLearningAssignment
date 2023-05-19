@@ -57,6 +57,9 @@ def split_dataset(df: pd.DataFrame, n_features=None, n_df=20, randomize_list=Tru
                 dataframes.append(df[l + [Y_class]])
             else:
                 continue
+
+    print(combinations_wo_repetitions)
+
     if randomize_list:
         random.shuffle(dataframes)
 
