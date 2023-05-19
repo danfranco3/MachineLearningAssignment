@@ -11,6 +11,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.svm import SVC
+from pymfe.mfe import MFE
+import pymfe.complexity as cp
+
+dataset_names = ['wdbc', 'diabetes', 'ilpd', 'credit-g']
 
 def holdout_estimation(X,y,models,ts=0.3,seed=0):
     X_train, X_test, y_train, y_test = \
@@ -34,16 +38,24 @@ def plot_ds2D(X,y):
     sns.scatterplot(x=X[0],y=X[1],hue=y,palette="deep")
     plt.show()
 
-dataset = openml.datasets.get_dataset('diabetes')
+for name in dataset_names:
 
-X, y, categorical_indicator, attribute_names = dataset.get_data(
-    dataset_format="array", target=dataset.default_target_attribute
-)
+    print(f"Analyzing dataset: {name}")
+    dataset = openml.datasets.get_dataset(name)
 
-linear_svc = SVC(kernel="linear")
+    X1, y1, categorical_indicator, attribute_names = dataset.get_data(
+        dataset_format="array", target=dataset.default_target_attribute
+    )
+    df = pd.DataFrame(X1, columns=attribute_names)
+    df["class"] = y1
+
+    mfe = MFE(groups=["complexity"])
+    mfe.fit(X1, y1)
+    ft = mfe.extract()
+    print("\n".join("{:50} {:30}".format(x, y) for x, y in zip(ft[0], ft[1])))
 
 
-print(X.shape)
+
 
 #plt.scatter(X[:, 0], X[:, 1], c=y)
 #plt.xlabel('Feature 1')

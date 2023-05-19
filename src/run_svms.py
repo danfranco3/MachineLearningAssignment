@@ -1,15 +1,15 @@
-import openml
 from dataset import split_dataset
 import openml
 import pandas as pd
 from svm import SVM
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import precision_score, recall_score, f1_score
 from sklearn.preprocessing import label_binarize
 import numpy as np
 from weights import calc_weights
 import matplotlib.pyplot as plt
 from itertools import cycle
+
 
 def get_dataset(dataset_name):
     dataset = openml.datasets.get_dataset(dataset_name)
@@ -23,12 +23,16 @@ def get_dataset(dataset_name):
     return df
 
 def accuracy(y_true, y_pred):
-    # print(y_true)
-    # print(y_pred)
-    #print(np.sum(y_true==y_pred))
-    #print(len(y_true))
-    #print(np.sum(y_true==y_pred) / len(y_true))
     return np.sum(y_true==y_pred) / len(y_true)
+
+def precision(y_true, y_pred):
+    return precision_score(y_true, y_pred)
+
+def recall(y_true, y_pred):
+    return recall_score(y_true, y_pred)
+
+def fMeasure(y_true, y_pred):
+    return f1_score(y_true, y_pred)
 
 def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, size=0.2, n_iters=1000, majority=False):
     
@@ -59,14 +63,24 @@ def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, size=
 
     resultsSize = len(svmPredictions[0])      # nr of predictions
 
-    finalPredictions = calc_weights(svmPredictions, resultsSize, majority)
+    finalPredictions = calc_weights(svmPredictions, resultsSize, True)
 
     y_pred = test["class"].to_numpy()
     finalPredictionsNP = np.array(finalPredictions)
 
-    print("Final SVM Accuracy: ", accuracy(y_pred, finalPredictionsNP))
+    print("Final SVM Accuracy without weights: ", accuracy(y_pred, finalPredictionsNP))
+    print("Final SVM Precision without weights: ", precision(y_pred, finalPredictionsNP))
+    print("Final SVM Recall without weights: ", recall(y_pred, finalPredictionsNP))
+    print("Final SVM f-Measure without weights: ", fMeasure(y_pred, finalPredictionsNP))
 
-    roc_curve_calculator(y_pred, finalPredictionsNP)
+    finalPredictions = calc_weights(svmPredictions, resultsSize, False)
+
+    finalPredictionsNP = np.array(finalPredictions)
+
+    print("Final SVM Accuracy with weights: ", accuracy(y_pred, finalPredictionsNP))
+    print("Final SVM Precision with weights: ", precision(y_pred, finalPredictionsNP))
+    print("Final SVM Recall with weights: ", recall(y_pred, finalPredictionsNP))
+    print("Final SVM f-Measure with weights: ", fMeasure(y_pred, finalPredictionsNP))
 
     return gen_df(dataset_name, n_df, accuracy(y_pred, finalPredictionsNP))
 
@@ -74,20 +88,3 @@ def gen_df(dataset_name, n_df, final_acc):
     df = pd.DataFrame.from_dict({'Dataset': dataset_name, 'n_df': n_df, 'final_acc': final_acc}, orient='index').transpose()
     return df
 
-def roc_curve_calculator(y_test, y_score):
-
-    # Compute ROC curve and ROC area
-    fpr, tpr, _ = roc_curve(y_test, y_score)
-    roc_auc = auc(fpr, tpr)
-
-    # Plot ROC curve
-    plt.figure()
-    plt.plot(fpr, tpr, color='blue', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
-    plt.plot([0, 1], [0, 1], color='gray', lw=2, linestyle='--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver Operating Characteristic')
-    plt.legend(loc="lower right")
-    plt.show()
