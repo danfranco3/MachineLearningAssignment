@@ -3,12 +3,14 @@ import openml
 import pandas as pd
 from svm import SVM
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import precision_score, recall_score, f1_score
+from sklearn.metrics import precision_score, recall_score, f1_score, confusion_matrix
 from sklearn.preprocessing import label_binarize
 import numpy as np
 from weights import calc_weights
 import matplotlib.pyplot as plt
 from itertools import cycle
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def get_dataset(dataset_name):
@@ -33,6 +35,18 @@ def recall(y_true, y_pred):
 
 def fMeasure(y_true, y_pred):
     return f1_score(y_true, y_pred, zero_division=0)
+
+def confusion_matrix_plot(y_true, y_pred):
+
+    cm = confusion_matrix(y_true, y_pred)
+
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+    plt.title("Confusion Matrix")
+    plt.xlabel("Predicted Labels")
+    plt.ylabel("True Labels")
+    plt.show()
+
 
 def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, size=0.2, n_iters=1000, majority=False):
     
@@ -72,6 +86,7 @@ def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, size=
     print("Final SVM Precision without weights: ", precision(y_pred, finalPredictionsNP))
     print("Final SVM Recall without weights: ", recall(y_pred, finalPredictionsNP))
     print("Final SVM f-Measure without weights: ", fMeasure(y_pred, finalPredictionsNP))
+    confusion_matrix_plot(y_pred, finalPredictionsNP)
 
     finalPredictions = calc_weights(svmPredictions, resultsSize, False)
 
@@ -81,6 +96,7 @@ def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, size=
     print("Final SVM Precision with weights: ", precision(y_pred, finalPredictionsNP))
     print("Final SVM Recall with weights: ", recall(y_pred, finalPredictionsNP))
     print("Final SVM f-Measure with weights: ", fMeasure(y_pred, finalPredictionsNP))
+    confusion_matrix_plot(y_pred, finalPredictionsNP)
 
     return gen_df(dataset_name, n_df, accuracy(y_pred, finalPredictionsNP))
 

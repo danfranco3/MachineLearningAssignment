@@ -1,7 +1,7 @@
 import openml
 import numpy as np
 import pandas as pd
-from run_svms import accuracy, precision, recall, fMeasure
+from run_svms import accuracy, precision, recall, fMeasure, confusion_matrix_plot
 from sklearn.model_selection import train_test_split
 from svm import SVM
 
@@ -28,3 +28,4 @@ def singleSVM(name, size):
     print("Precision of base SVM: ", precision(test["class"].to_numpy(), prediction))
     print("Recall of base SVM: ", recall(test["class"].to_numpy(), prediction))
     print("f-Measure of base SVM: ", fMeasure(test["class"].to_numpy(), prediction))
+    confusion_matrix_plot(test["class"].to_numpy(), prediction)
