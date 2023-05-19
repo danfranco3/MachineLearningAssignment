@@ -21,6 +21,9 @@ def get_dataset(dataset_name):
 def accuracy(y_true, y_pred):
     # print(y_true)
     # print(y_pred)
+    #print(np.sum(y_true==y_pred))
+    #print(len(y_true))
+    #print(np.sum(y_true==y_pred) / len(y_true))
     return np.sum(y_true==y_pred) / len(y_true)
 
 def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, test_size=0.2, n_iters=1000, majority=False):
@@ -32,7 +35,7 @@ def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, test_
     subdataframe_list = split_dataset(train, 2, 28, randomize_list=False)
 
     svmPredictions = [None] * len(subdataframe_list)         # set of predictions from each svm
-    resultsSize = 0                                   # nr of predictions
+
 
     for i in range(len(subdataframe_list)):
         
@@ -44,21 +47,22 @@ def test_with_dataset(dataset_name, n_df=28, n_features=2, random_state=1, test_
         svmPredictions[i] = predictions
 
         prediction = np.sign(predictions)
-        np.where(prediction == -1, 0, 1)
+        prediction = np.where(prediction == -1, 0, 1)
 
         print("SVM Accuracy: ", accuracy(test["class"].to_numpy(), prediction))
 
     print("Calculating weights...")
 
+    resultsSize = len(svmPredictions[0])      # nr of predictions
+
     finalPredictions = calc_weights(svmPredictions, resultsSize, majority)
 
-    print(test)
-
     y_pred = test["class"].to_numpy()
+    finalPredictionsNP = np.array(finalPredictions)
 
-    print("Final SVM Accuracy: ", accuracy(y_pred, finalPredictions))
+    print("Final SVM Accuracy: ", accuracy(y_pred, finalPredictionsNP))
 
-    return gen_df(dataset_name, n_df, accuracy(y_pred, finalPredictions))
+    return gen_df(dataset_name, n_df, accuracy(y_pred, finalPredictionsNP))
 
 def gen_df(dataset_name, n_df, final_acc):
     df = pd.DataFrame.from_dict({'Dataset': dataset_name, 'n_df': n_df, 'final_acc': final_acc}, orient='index').transpose()

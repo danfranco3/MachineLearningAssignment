@@ -9,7 +9,7 @@ dataset_names = ['diabetes']
 
 TEST_SIZE = 0.2
 
-parameter_variation = [(28, 2, True), (28, 2, False), (26, 2, True), (27, 3, True)]
+parameter_variation = [(28, 2, False), (28, 2, False), (26, 2, True), (27, 3, True)]
 
 for name in dataset_names:
     for (n_df, n_features, majority) in parameter_variation:
